@@ -9,10 +9,13 @@ const router = express.Router();
 // router.patch('/api/v1/tours/:id', updateTour);
 // router.delete('/api/v1/tours/:id', deleteTour);
 
+router.param('id', tourController.checkID);
+
 router
   .route('/')
   .get(tourController.getAllTours)
-  .post(tourController.createTour);
+  .post(tourController.checkBody, tourController.createTour);
+
 router
   .route('/:id')
   .get(tourController.getTour)

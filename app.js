@@ -8,10 +8,10 @@ const userRouter = require('./routes/userRoutes');
 const app = express();
 
 ////////////////////////////////////
-// MIDDLEWARES
+// GLOBAL MIDDLEWARES
 app.use(morgan('dev')); // HTTP request logger
-
 app.use(express.json()); //  a function to modify incoming request data
+//app.use(express.static(`${__dirname}/public`)); // serving static files
 
 app.use((req, res, next) => {
   console.log('I came from the middleware 🍓');
