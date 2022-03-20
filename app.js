@@ -9,7 +9,9 @@ const app = express();
 
 ////////////////////////////////////
 // GLOBAL MIDDLEWARES
-app.use(morgan('dev')); // HTTP request logger
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev')); // HTTP request logger
+}
 app.use(express.json()); //  a function to modify incoming request data
 //app.use(express.static(`${__dirname}/public`)); // serving static files
 
