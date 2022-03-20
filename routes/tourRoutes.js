@@ -9,7 +9,7 @@ const router = express.Router();
 // router.patch('/api/v1/tours/:id', updateTour);
 // router.delete('/api/v1/tours/:id', deleteTour);
 
-router.param('id', tourController.checkID);
+//router.param('id', tourController.checkID);
 
 router
   .route('/')
