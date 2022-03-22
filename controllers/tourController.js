@@ -6,8 +6,24 @@ const Tour = require('../models/tourModel');
 
 exports.getAllTours = async (req, res) => {
   try {
-    const tours = await Tour.find();
+    //const tours = await Tour.find(req.query); // good not great - this method is very limited (no sort, pagination, etc...)
 
+    // BUILD QUERY
+    // Part 1: Filtering
+    const queryObj = { ...req.query }; // create a new object with the same key value pairs of req.query
+    const excludeFields = ['page', 'sort', 'limit', 'fields'];
+    excludeFields.forEach((el) => delete queryObj[el]);
+
+    // Part 2: Advanced Filtering
+    let queryStr = JSON.stringify(queryObj);
+    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
+
+    const query = Tour.find(JSON.parse(queryStr)); // if we use await at this point, the query would execute and return the documents and therefore we would not be able to chain filters
+
+    // EXECUTE QUERY
+    const tours = await query;
+
+    // SEND RESPONSE
     res.status(200).json({
       status: 'success',
       results: tours.length,
