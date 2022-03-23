@@ -14,13 +14,43 @@ exports.getAllTours = async (req, res) => {
     const excludeFields = ['page', 'sort', 'limit', 'fields'];
     excludeFields.forEach((el) => delete queryObj[el]);
 
-    // Part 2: Advanced Filtering
+    // Part 2.1: Advanced Filtering
     let queryStr = JSON.stringify(queryObj);
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
 
-    const query = Tour.find(JSON.parse(queryStr)); // if we use await at this point, the query would execute and return the documents and therefore we would not be able to chain filters
+    let query = Tour.find(JSON.parse(queryStr)); // if we use await at this point, the query would execute and return the documents and therefore we would not be able to chain filters
 
-    // EXECUTE QUERY
+    // Part 2.2: Sorting
+    if (req.query.sort) {
+      const sortBy = req.query.sort.split(',').join(' ');
+      query = query.sort(sortBy);
+    } else {
+      //default sorting
+      query = query.sort('name');
+    }
+
+    // Part 2.3: Fields limiting
+    if (req.query.fields) {
+      const fields = req.query.fields.split(',').join(' ');
+      query = query.select(fields);
+    } else {
+      // default unselect
+      query = query.select('-__v'); // exclude __v field (used by mongodb)
+    }
+
+    // Part 2.4: Pagination
+    const page = req.query.page * 1 || 1;
+    const limit = req.query.limit * 1 || 100;
+    const skip = (page - 1) * limit;
+
+    query = query.skip(skip).limit(limit);
+
+    if (req.query.page) {
+      const numTours = await Tour.countDocuments();
+      if (skip >= numTours) throw new Error('This page does not exist');
+    }
+
+    // EXECUTE QUERY`
     const tours = await query;
 
     // SEND RESPONSE
@@ -34,7 +64,7 @@ exports.getAllTours = async (req, res) => {
   } catch (err) {
     res.status(404).json({
       status: 'fail',
-      message: err,
+      message: err.message,
     });
   }
 };
