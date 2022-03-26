@@ -174,10 +174,10 @@ exports.getMonthlyPlan = async (req, res) => {
         },
       },
       {
-        $addFields: { month: '$_id' },
+        $addFields: { month: '$_id' }, // add field
       },
       {
-        $project: { _id: 0 },
+        $project: { _id: 0 }, // hide field
       },
       {
         $sort: { numTourStarts: -1 },
