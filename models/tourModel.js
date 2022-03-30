@@ -1,15 +1,17 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
+//const validator = require('validator');
 
 const tourSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, 'A Tour must have a name'],
+      required: [true, 'Tour must have a name'],
       unique: true,
       trim: true,
-      maxlength: [40, 'A Tour name must have less or equal then 40 characters'],
-      minlength: [10, 'A Tour name must have more or equal then 10 characters'],
+      maxlength: [40, 'Tour name must have less or equal then 40 characters'],
+      minlength: [10, 'Tour name must have more or equal then 10 characters'],
+      //validate: [validator.isAlpha, 'Tour name must only contain characters'], // example of validation using an external library
     },
     slug: String,
     duration: {
@@ -44,6 +46,12 @@ const tourSchema = new mongoose.Schema(
     },
     priceDiscount: {
       type: Number,
+      validate: {
+        validator: function (val) {
+          return val < this.price;
+        },
+        message: 'Discount price ({VALUE}) should be lower than regular price',
+      },
     },
     summary: {
       type: String,
