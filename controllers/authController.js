@@ -16,6 +16,22 @@ const signToken = (id) =>
 const createSendToken = (user, statusCode, res) => {
   const token = signToken(user._id);
 
+  const cookieOptions = {
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000,
+    ),
+    httpOnly: true,
+  };
+
+  if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
+
+  res.cookie('jwt', token, cookieOptions);
+
+  // remove fields from output
+  user.password = undefined;
+  user.isPendingConfirmation = undefined;
+  user.active = undefined;
+
   res.status(statusCode).json({
     status: 'success',
     token,
@@ -26,7 +42,7 @@ const createSendToken = (user, statusCode, res) => {
 };
 
 exports.signup = catchAsync(async (req, res, next) => {
-  const newUser = await User.create({
+  const user = await User.create({
     name: req.body.name,
     email: req.body.email,
     role: req.body.role,
@@ -35,7 +51,33 @@ exports.signup = catchAsync(async (req, res, next) => {
     passwordChangeAt: req.body.passwordChangeAt,
   });
 
-  createSendToken(newUser, 201, res);
+  const resetURL = `${req.protocol}://${req.get(
+    'host',
+  )}/api/v1/users/confirmMyAccount/${user.confirmationToken}`;
+
+  const message = `Confirm your user account by submitting a PATCH request using the following URL: ${resetURL}`;
+
+  try {
+    await sendEmail({
+      email: user.email,
+      subject: 'Account confirmation',
+      message,
+    });
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Confirmation email has been sent!',
+    });
+  } catch (err) {
+    return next(
+      new AppError(
+        'There was an error sending the email. Please, try again later',
+        500,
+      ),
+    );
+  }
+
+  //createSendToken(newUser, 201, res);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -46,11 +88,21 @@ exports.login = catchAsync(async (req, res, next) => {
     return next(new AppError('Please provide email and password', 400));
 
   // Step 2: Check if user exists && password is correct
-  const user = await User.findOne({ email }).select('+password');
+  const user = await User.findOne({ email }).select(
+    '+password +isPendingConfirmation +active',
+  );
   if (!user || !(await user.correctPassword(password, user.password)))
     return next(new AppError('Incorrect email or password', 401));
 
-  // Step 3: If everything is ok, send token to client
+  // Step 3: Check account is confirmed
+  if (user.isPendingConfirmation)
+    return next(new AppError('Please confirm your account', 401));
+
+  // Step 4: Check if account is active
+  if (!user.active)
+    return next(new AppError('Your account is not active', 401));
+
+  // Step 5: If everything is ok, send token to client
   createSendToken(user, 200, res);
 });
 
@@ -114,7 +166,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
     'host',
   )}/api/v1/users/resetPassword/${resetToken}`;
 
-  const message = `Forgot your password? Submite a PATCH request with your new password and passwordConfirm to: ${resetURL}\nIf you didn't forget your password, please ignore this email.`;
+  const message = `Forgot your password? Submit a PATCH request with your new password and passwordConfirm to: ${resetURL}\nIf you didn't forget your password, please ignore this email.`;
 
   try {
     await sendEmail({
@@ -157,11 +209,10 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   user.passwordConfirm = req.body.passwordConfirm;
   user.passwordResetToken = undefined;
   user.passwordResetExpires = undefined;
+  user.passwordChangedAt = Date.now();
   await user.save();
 
-  // Step 3: Update changedPassord at
-
-  // Steo 4: Log in user
+  // Step 3: Log in user
   createSendToken(user, 200, res);
 });
 
@@ -179,5 +230,25 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   await user.save();
 
   // Step 4: log user in
+  createSendToken(user, 200, res);
+});
+
+exports.confirmAccount = catchAsync(async (req, res, next) => {
+  // Step 1: Get user based on token
+  const { token } = req.params;
+
+  const user = await User.findOne({
+    confirmationToken: token,
+  }).select('+isPendingConfirmation');
+
+  // Step 2: Check user is found
+  if (!user) return next(new AppError('Token is invalid', 400));
+
+  user.confirmationToken = undefined;
+  user.isPendingConfirmation = false;
+
+  await user.save({ validateBeforeSave: false });
+
+  // Step 3: Log in user
   createSendToken(user, 200, res);
 });

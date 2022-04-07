@@ -44,6 +44,28 @@ const userSchema = new mongoose.Schema({
   passwordChangedAt: Date,
   passwordResetToken: String,
   passwordResetExpires: Date,
+  active: {
+    type: Boolean,
+    default: true,
+    select: false,
+  },
+  isPendingConfirmation: {
+    type: Boolean,
+    default: true,
+    select: false,
+  },
+  confirmationToken: {
+    type: String,
+    select: true,
+  },
+});
+
+userSchema.pre('save', async function (next) {
+  // Only run function if is new user
+  if (!this.isNew) return next();
+  this.confirmationToken = crypto.randomBytes(5).toString('hex');
+
+  next();
 });
 
 userSchema.pre('save', async function (next) {
@@ -61,6 +83,12 @@ userSchema.pre('save', function (next) {
   if (!this.isModified('password') || this.isNew) return next();
 
   this.passwordChangedAt = Date.now() - 1000;
+  next();
+});
+
+//get only active documents
+userSchema.pre(/^find/, function (next) {
+  this.find({ active: { $ne: false } });
   next();
 });
 
