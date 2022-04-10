@@ -1,8 +1,5 @@
 const Tour = require('../models/tourModel');
-const APIFeatures = require('../utils/apiFeatures');
-
 const catchAsync = require('../utils/catchAsync');
-const AppError = require('../utils/appError');
 const factory = require('./handlerFactory');
 
 // const tours = JSON.parse(
@@ -16,77 +13,78 @@ exports.aliasTopTours = (req, res, next) => {
   next();
 };
 
-exports.getAllTours = catchAsync(async (req, res, next) => {
-  //const tours = await Tour.find(req.query); // good not great - this method is very limited (no sort, pagination, etc...)
-  // EXECUTE QUERY
-  const features = new APIFeatures(Tour.find(), req.query)
-    .filter()
-    .sort()
-    .limitFields()
-    .paginate();
-  const tours = await features.query;
+////////////////////////////////////////////////////////////////////
+// V1 (BEFORE FACTORY):
 
-  // SEND RESPONSE
-  res.status(200).json({
-    status: 'success',
-    results: tours.length,
-    data: {
-      tours, // if key and value and have same name no need to type both (ES6)
-    },
-  });
-});
+// exports.getAllTours = catchAsync(async (req, res, next) => {
+//   //const tours = await Tour.find(req.query); // good not great - this method is very limited (no sort, pagination, etc...)
+//   // EXECUTE QUERY
+//   const features = new APIFeatures(Tour.find(), req.query)
+//     .filter()
+//     .sort()
+//     .limitFields()
+//     .paginate();
+//   const tours = await features.query;
 
-exports.getTour = catchAsync(async (req, res, next) => {
-  //const tour = await Tour.findOne({ _id: req.params.id });
-  const tour = await Tour.findById(req.params.id).populate('reviews');
-  // Logic moved to middleware in TourModel(find middleware) so it will work for all find methods
-  // .populate({
-  //   path: 'guides',
-  //   select: '-__v -passwordChangedAt',
-  // });
+//   // SEND RESPONSE
+//   res.status(200).json({
+//     status: 'success',
+//     results: tours.length,
+//     data: {
+//       tours, // if key and value and have same name no need to type both (ES6)
+//     },
+//   });
+// });
 
-  if (!tour) {
-    return next(new AppError('No tour found with that ID', 404));
-  }
+// exports.getTour = catchAsync(async (req, res, next) => {
+//   //const tour = await Tour.findOne({ _id: req.params.id });
+//   const tour = await Tour.findById(req.params.id).populate('reviews');
+//   // Logic moved to middleware in TourModel(find middleware) so it will work for all find methods
+//   // .populate({
+//   //   path: 'guides',
+//   //   select: '-__v -passwordChangedAt',
+//   // });
 
-  res.status(200).json({
-    status: 'success',
-    data: {
-      tour,
-    },
-  });
-});
+//   if (!tour) {
+//     return next(new AppError('No tour found with that ID', 404));
+//   }
 
-exports.createTour = catchAsync(async (req, res, next) => {
-  const newTour = await Tour.create(req.body);
+//   res.status(200).json({
+//     status: 'success',
+//     data: {
+//       tour,
+//     },
+//   });
+// });
 
-  res.status(201).json({
-    status: 'success',
-    data: {
-      tour: newTour,
-    },
-  });
-});
+// exports.createTour = catchAsync(async (req, res, next) => {
+//   const newTour = await Tour.create(req.body);
 
-exports.updateTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true,
-  }); // the 3rd argument option returns the updated document - https://mongoosejs.com/docs/api.html#model_Model.findByIdAndUpdate
+//   res.status(201).json({
+//     status: 'success',
+//     data: {
+//       tour: newTour,
+//     },
+//   });
+// });
 
-  if (!tour) {
-    return next(new AppError('No tour found with that ID', 404));
-  }
+// exports.updateTour = catchAsync(async (req, res, next) => {
+//   const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
+//     new: true,
+//     runValidators: true,
+//   }); // the 3rd argument option returns the updated document - https://mongoosejs.com/docs/api.html#model_Model.findByIdAndUpdate
 
-  res.status(200).json({
-    status: 'success',
-    data: {
-      tour,
-    },
-  });
-});
+//   if (!tour) {
+//     return next(new AppError('No tour found with that ID', 404));
+//   }
 
-exports.deleteTour = factory.deleteOne(Tour);
+//   res.status(200).json({
+//     status: 'success',
+//     data: {
+//       tour,
+//     },
+//   });
+// });
 
 // exports.deleteTour = catchAsync(async (req, res, next) => {
 //   const tour = await Tour.findByIdAndDelete(req.params.id);
@@ -100,6 +98,15 @@ exports.deleteTour = factory.deleteOne(Tour);
 //     data: null,
 //   });
 // });
+
+////////////////////////////////////////////////////////////////////
+// V2 (AFTER FACTORY):
+exports.getAllTours = factory.getAll(Tour);
+exports.getTour = factory.getOne(Tour, { path: 'reviews' });
+exports.createTour = factory.createOne(Tour);
+exports.updateTour = factory.updateOne(Tour);
+exports.deleteTour = factory.deleteOne(Tour);
+////////////////////////////////////////////////////////////////////
 
 exports.getTourStats = catchAsync(async (req, res, next) => {
   const stats = await Tour.aggregate([
