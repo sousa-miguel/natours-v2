@@ -73,10 +73,43 @@ const tourSchema = new mongoose.Schema(
       select: false,
     },
     startDates: [Date],
-    secretTour: Boolean,
-    default: false,
+    secretTour: {
+      type: Boolean,
+      default: false,
+    },
+    startLocation: {
+      // GeoJSON
+      type: {
+        type: String,
+        default: 'Point',
+        enum: ['Point'],
+      },
+      coordinates: [Number],
+      address: String,
+      description: String,
+    },
+    locations: [
+      {
+        type: {
+          type: String,
+          default: 'Point',
+          enum: ['Point'],
+        },
+        coordinates: [Number],
+        address: String,
+        description: String,
+        day: Number,
+      },
+    ],
+    guides: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User',
+      },
+    ],
   },
   {
+    // so whenever we have a calculated attribute (not stored in DB) it shows in output
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
   },
@@ -91,6 +124,14 @@ tourSchema.pre('save', function (next) {
   this.slug = slugify(this.name, { lower: true });
   next();
 });
+
+// EMBEDDING EXAMPLE:
+// tourSchema.pre('save', async function (next) {
+//   // get user document by Id and store it in the Guide field (array of users)
+//   const guidesPromises = this.guides.map(async (id) => await User.findById(id));
+//   this.guides = await Promise.all(guidesPromises);
+//   next();
+// });
 
 // tourSchema.post('save', function (doc, next) {
 //   console.log(doc);
@@ -111,8 +152,15 @@ tourSchema.pre('save', function (next) {
 // /^find/ all strings that start with find
 tourSchema.pre(/^find/, function (next) {
   this.find({ secretTour: { $ne: true } });
-
   //this.start = Date.now();
+  next();
+});
+
+tourSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: 'guides',
+    select: '-__v -passwordChangedAt',
+  });
   next();
 });
 
