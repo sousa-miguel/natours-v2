@@ -77,6 +77,7 @@ exports.getAll = (Model) =>
       .sort()
       .limitFields()
       .paginate();
+    //const doc = await features.query.explain(); // used to analyze query performance
     const doc = await features.query;
 
     // SEND RESPONSE
