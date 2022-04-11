@@ -60,6 +60,8 @@ const userSchema = new mongoose.Schema({
   },
 });
 
+// Encrypt password
+
 userSchema.pre('save', async function (next) {
   // Only run function if is new user
   if (!this.isNew) return next();
