@@ -51,11 +51,11 @@ exports.signup = catchAsync(async (req, res, next) => {
     passwordChangeAt: req.body.passwordChangeAt,
   });
 
-  const resetURL = `${req.protocol}://${req.get(
+  const confirmURL = `${req.protocol}://${req.get(
     'host',
   )}/api/v1/users/confirmMyAccount/${user.confirmationToken}`;
 
-  const message = `Confirm your user account by submitting a PATCH request using the following URL: ${resetURL}`;
+  const message = `Confirm your user account by submitting a PATCH request using the following URL: ${confirmURL}`;
 
   try {
     await sendEmail({
@@ -76,8 +76,6 @@ exports.signup = catchAsync(async (req, res, next) => {
       ),
     );
   }
-
-  //createSendToken(newUser, 201, res);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
