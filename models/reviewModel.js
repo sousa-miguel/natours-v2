@@ -35,7 +35,7 @@ const reviewSchema = new mongoose.Schema(
 );
 
 // Index to prevent duplicate reviews (preveting the same user from making multiple reviews on the same tour)
-reviewSchema.index({ tour: 1, user: 1 }, { unique: true });
+reviewSchema.index({ tour: 1, author: 1 }, { unique: true });
 
 ///////////////////////////////////////////////////
 // QUERY MIDDLEWARES
