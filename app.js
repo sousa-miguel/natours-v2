@@ -1,3 +1,4 @@
+const path = require('path');
 // External modules
 const express = require('express');
 const morgan = require('morgan');
@@ -12,11 +13,19 @@ const globalErrorHandler = require('./controllers/errorController');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
+const viewRouter = require('./routes/viewRoutes');
 
 const app = express();
 
+app.set('view engine', 'pug');
+app.set('views', path.join(__dirname, 'views'));
+
 ////////////////////////////////////
 // GLOBAL MIDDLEWARES
+
+// Serving static files
+//app.use(express.static(`${__dirname}/public`));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Set Security HTTP Headers
 app.use(helmet());
@@ -60,9 +69,6 @@ app.use(
   }),
 );
 
-// Serving static files
-app.use(express.static(`${__dirname}/public`));
-
 // app.use((req, res, next) => {
 //   console.log('I came from the middleware 🍓');
 //   next(); // continue the response cycle
@@ -77,6 +83,7 @@ app.use((req, res, next) => {
 ////////////////////////////////////
 // ROUTES
 const apiPath = '/api/v1/';
+app.use('/', viewRouter);
 app.use(`${apiPath}tours`, tourRouter);
 app.use(`${apiPath}users`, userRouter);
 app.use(`${apiPath}reviews`, reviewRouter);
