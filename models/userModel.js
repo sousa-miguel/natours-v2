@@ -49,15 +49,15 @@ const userSchema = new mongoose.Schema({
     default: true,
     select: false,
   },
-  isPendingConfirmation: {
-    type: Boolean,
-    default: true,
-    select: false,
-  },
-  confirmationToken: {
-    type: String,
-    select: true,
-  },
+  // isPendingConfirmation: {
+  //   type: Boolean,
+  //   default: true,
+  //   select: false,
+  // },
+  // confirmationToken: {
+  //   type: String,
+  //   select: true,
+  // },
 });
 
 // Encrypt password

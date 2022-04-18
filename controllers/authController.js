@@ -51,31 +51,32 @@ exports.signup = catchAsync(async (req, res, next) => {
     passwordChangeAt: req.body.passwordChangeAt,
   });
 
-  const confirmURL = `${req.protocol}://${req.get(
-    'host',
-  )}/api/v1/users/confirmMyAccount/${user.confirmationToken}`;
+  // const confirmURL = `${req.protocol}://${req.get(
+  //   'host',
+  // )}/api/v1/users/confirmMyAccount/${user.confirmationToken}`;
 
-  const message = `Confirm your user account by submitting a PATCH request using the following URL: ${confirmURL}`;
+  // const message = `Confirm your user account by submitting a PATCH request using the following URL: ${confirmURL}`;
 
-  try {
-    await sendEmail({
-      email: user.email,
-      subject: 'Account confirmation',
-      message,
-    });
+  // try {
+  //   await sendEmail({
+  //     email: user.email,
+  //     subject: 'Account confirmation',
+  //     message,
+  //   });
 
-    res.status(200).json({
-      status: 'success',
-      message: 'Confirmation email has been sent!',
-    });
-  } catch (err) {
-    return next(
-      new AppError(
-        'There was an error sending the email. Please, try again later',
-        500,
-      ),
-    );
-  }
+  //   res.status(200).json({
+  //     status: 'success',
+  //     message: 'Confirmation email has been sent!',
+  //   });
+  // } catch (err) {
+  //   return next(
+  //     new AppError(
+  //       'There was an error sending the email. Please, try again later',
+  //       500,
+  //     ),
+  //   );
+  // }
+  createSendToken(user, 201, res);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -281,22 +282,22 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   createSendToken(user, 200, res);
 });
 
-exports.confirmAccount = catchAsync(async (req, res, next) => {
-  // Step 1: Get user based on token
-  const { token } = req.params;
+// exports.confirmAccount = catchAsync(async (req, res, next) => {
+//   // Step 1: Get user based on token
+//   const { token } = req.params;
 
-  const user = await User.findOne({
-    confirmationToken: token,
-  }).select('+isPendingConfirmation');
+//   const user = await User.findOne({
+//     confirmationToken: token,
+//   }).select('+isPendingConfirmation');
 
-  // Step 2: Check user is found
-  if (!user) return next(new AppError('Token is invalid', 400));
+//   // Step 2: Check user is found
+//   if (!user) return next(new AppError('Token is invalid', 400));
 
-  user.confirmationToken = undefined;
-  user.isPendingConfirmation = false;
+//   user.confirmationToken = undefined;
+//   user.isPendingConfirmation = false;
 
-  await user.save({ validateBeforeSave: false });
+//   await user.save({ validateBeforeSave: false });
 
-  // Step 3: Log in user
-  createSendToken(user, 200, res);
-});
+//   // Step 3: Log in user
+//   createSendToken(user, 200, res);
+// });

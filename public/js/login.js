@@ -3,7 +3,7 @@
 import axios from 'axios';
 import { showAlert } from './alert';
 
-export const login = async (email, password) => {
+export const login = async (email, password, showFeedback = true) => {
   try {
     const res = await axios({
       method: 'POST',
@@ -15,7 +15,7 @@ export const login = async (email, password) => {
     });
 
     if (res.data.status === 'success') {
-      showAlert('success', 'Logged in successfully!');
+      if (showFeedback) showAlert('success', 'Logged in successfully!');
       window.setTimeout(() => {
         location.assign('/');
       }, 1500);
