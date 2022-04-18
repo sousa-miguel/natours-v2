@@ -46,8 +46,8 @@ const limiter = rateLimit({
 // Limit number of requests per IP / hour
 app.use('/api', limiter);
 
-// Body parser, reading data from body into req.body
-app.use(express.json({ limit: '10kb' }));
+app.use(express.json({ limit: '10kb' })); // Body parser, reading data from body into req.body
+app.use(express.urlencoded({ extended: true, limit: '10kb' })); // Parse data coming from Form
 app.use(cookieParser());
 
 // Data sanatization against NOSQL query injection
@@ -76,11 +76,11 @@ app.use(
 //   next(); // continue the response cycle
 // });
 
-// Test middleware...
-app.use((req, res, next) => {
-  req.requestTime = new Date().toISOString();
-  next();
-});
+// // Test middleware...
+// app.use((req, res, next) => {
+//   req.requestTime = new Date().toISOString();
+//   next();
+// });
 
 ////////////////////////////////////
 // ROUTES
