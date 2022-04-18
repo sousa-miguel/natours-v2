@@ -104,6 +104,14 @@ exports.login = catchAsync(async (req, res, next) => {
   createSendToken(user, 200, res);
 });
 
+exports.logout = (req, res) => {
+  res.cookie('jwt', 'loggedout', {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true,
+  });
+  res.status(200).json({ status: 'success' });
+};
+
 exports.protect = catchAsync(async (req, res, next) => {
   // Step 1: Get token and check if exists
   let token;
@@ -139,39 +147,46 @@ exports.protect = catchAsync(async (req, res, next) => {
 });
 
 // Only for rendered pages
-exports.isLoggedIn = catchAsync(async (req, res, next) => {
+exports.isLoggedIn = async (req, res, next) => {
   if (req.cookies.jwt) {
-    if (!req.cookies.jwt)
-      return next(
-        new AppError('You are not logged in! Please log in to get access', 401),
+    try {
+      if (!req.cookies.jwt)
+        return next(
+          new AppError(
+            'You are not logged in! Please log in to get access',
+            401,
+          ),
+        );
+
+      // Step 2: Verificate token
+      const decoded = await promisify(jwt.verify)(
+        req.cookies.jwt,
+        process.env.JWT_SECRET,
       );
 
-    // Step 2: Verificate token
-    const decoded = await promisify(jwt.verify)(
-      req.cookies.jwt,
-      process.env.JWT_SECRET,
-    );
+      // Step 3: Check user still exists
+      const freshUser = await User.findById(decoded.id);
+      if (!freshUser)
+        return next(new AppError('The user no longer exists...', 401));
 
-    // Step 3: Check user still exists
-    const freshUser = await User.findById(decoded.id);
-    if (!freshUser)
-      return next(new AppError('The user no longer exists...', 401));
+      // Step 4: Check user changed password after token was issued
+      if (await freshUser.changedPasswordAfter(decoded.iat))
+        return next(
+          new AppError(
+            'You recently changed password. Please log in again!',
+            401,
+          ),
+        );
 
-    // Step 4: Check user changed password after token was issued
-    if (await freshUser.changedPasswordAfter(decoded.iat))
-      return next(
-        new AppError(
-          'You recently changed password. Please log in again!',
-          401,
-        ),
-      );
-
-    // THERE IS A LOGGED IN USER
-    res.locals.user = freshUser;
-    return next();
+      // THERE IS A LOGGED IN USER
+      res.locals.user = freshUser;
+      return next();
+    } catch (err) {
+      return next();
+    }
   }
   next();
-});
+};
 
 exports.restrictTo =
   (...roles) =>
