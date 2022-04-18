@@ -2,3 +2,4 @@ node_modules
 config.env
 dev-data/templates
 dev-data/img
+.cache
