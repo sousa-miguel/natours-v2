@@ -40528,7 +40528,9 @@ var displayMap = function displayMap(locations) {
     }).setLngLat(loc.coordinates).addTo(map); // Add popup
 
     new _mapboxGl.default.Popup({
-      offset: 30
+      offset: 30,
+      focusAfterOpen: false // prevent automatic scroll to popup
+
     }).setLngLat(loc.coordinates).setHTML("<p>Day ".concat(loc.day, ": ").concat(loc.description, "</p>")).addTo(map); // Extend map bounds to include current location
 
     bounds.extend(loc.coordinates);
