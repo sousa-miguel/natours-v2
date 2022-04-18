@@ -52,19 +52,9 @@ const userSchema = new mongoose.Schema({
     default: true,
     select: false,
   },
-  // isPendingConfirmation: {
-  //   type: Boolean,
-  //   default: true,
-  //   select: false,
-  // },
-  // confirmationToken: {
-  //   type: String,
-  //   select: true,
-  // },
 });
 
 // Encrypt password
-
 userSchema.pre('save', async function (next) {
   // Only run function if is new user
   if (!this.isNew) return next();
