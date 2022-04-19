@@ -6,6 +6,7 @@ import { login, logout } from './login';
 import { signup } from './signup';
 import { updateSettings } from './updateSettings';
 import { bookTour } from './stripe';
+import { showAlert } from './alert';
 
 // DOM ELEMENTS
 const mapBox = document.getElementById('map');
@@ -15,6 +16,7 @@ const updateDataForm = document.querySelector('.form-user-data');
 const updatePasswordForm = document.querySelector('.form-user-password');
 const logOutBtn = document.querySelector('.nav__el--logout');
 const bookBtn = document.getElementById('book-tour');
+const alertMessage = document.querySelector('body').dataset.alert;
 
 // VALUES
 
@@ -96,3 +98,6 @@ if (bookBtn) {
     bookTour(tourId);
   });
 }
+
+// Alert message (right now is only used after booking)
+if (alertMessage) showAlert('success', alertMessage, 15);

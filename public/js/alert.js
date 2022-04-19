@@ -6,7 +6,7 @@ export const hideAlert = () => {
 };
 
 // type can be 'success' or 'error'
-export const showAlert = (type, msg) => {
+export const showAlert = (type, msg, time = 5) => {
   // close alerts before opening a new one
   hideAlert();
   // alert markup
@@ -14,5 +14,5 @@ export const showAlert = (type, msg) => {
   // render alert
   document.querySelector('body').insertAdjacentHTML('afterbegin', markup);
   // close alert after 5 seconds
-  window.setTimeout(hideAlert, 5000);
+  window.setTimeout(hideAlert, time * 1000);
 };
