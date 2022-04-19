@@ -17,6 +17,7 @@ const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
 const bookingRouter = require('./routes/bookingRoutes');
+const bookingController = require('./controllers/bookingController');
 const viewRouter = require('./routes/viewRoutes');
 
 const app = express();
@@ -54,6 +55,13 @@ const limiter = rateLimit({
 
 // Limit number of requests per IP / hour
 app.use('/api', limiter);
+
+// We need the body coming from the request no in JSON (BEFORE LINE 62)
+app.post(
+  'webhook-checkout',
+  express.raw({ type: 'application/json' }),
+  bookingController.webhookCheckout,
+);
 
 app.use(express.json({ limit: '10kb' })); // Body parser, reading data from body into req.body
 app.use(express.urlencoded({ extended: true, limit: '10kb' })); // Parse data coming from Form
