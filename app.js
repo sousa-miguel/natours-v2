@@ -58,7 +58,7 @@ app.use('/api', limiter);
 
 // We need the body coming from the request no in JSON (BEFORE LINE 62)
 app.post(
-  'webhook-checkout',
+  '/webhook-checkout',
   express.raw({ type: 'application/json' }),
   bookingController.webhookCheckout,
 );
