@@ -13,19 +13,17 @@ const signToken = (id) =>
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 
-const createSendToken = (user, statusCode, res) => {
+const createSendToken = (user, statusCode, req, res) => {
   const token = signToken(user._id);
 
-  const cookieOptions = {
+  res.cookie('jwt', token, {
     expires: new Date(
       Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000,
     ),
     httpOnly: true,
-  };
-
-  if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
-
-  res.cookie('jwt', token, cookieOptions);
+    secure: req.secure || req.hearders('x-forwarded-proto') === 'https',
+    //secure: process.env.NODE_ENV === 'production';
+  });
 
   // remove fields from output
   user.password = undefined;
@@ -45,7 +43,7 @@ exports.signup = catchAsync(async (req, res, next) => {
   const newUser = await User.create(req.body);
   const url = `${req.protocol}://${req.get('host')}/me`;
   await new Email(newUser, url).sendWelcome();
-  createSendToken(newUser, 201, res);
+  createSendToken(newUser, 201, req, res);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -71,7 +69,7 @@ exports.login = catchAsync(async (req, res, next) => {
     return next(new AppError('Your account is not active', 401));
 
   // Step 5: If everything is ok, send token to client
-  createSendToken(user, 200, res);
+  createSendToken(user, 200, req, res);
 });
 
 exports.logout = (req, res) => {
@@ -227,7 +225,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   await user.save();
 
   // Step 3: Log in user
-  createSendToken(user, 200, res);
+  createSendToken(user, 200, req, res);
 });
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
@@ -244,7 +242,7 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   await user.save();
 
   // Step 4: log user in
-  createSendToken(user, 200, res);
+  createSendToken(user, 200, req, res);
 });
 
 // exports.confirmAccount = catchAsync(async (req, res, next) => {
@@ -264,5 +262,5 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
 //   await user.save({ validateBeforeSave: false });
 
 //   // Step 3: Log in user
-//   createSendToken(user, 200, res);
+//   createSendToken(user, 200, req, res);
 // });
