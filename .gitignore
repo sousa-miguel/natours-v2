@@ -1,5 +1,5 @@
-node_modules
-config.env
+node_modules/
+*.env
 dev-data/templates
 dev-data/img
 .cache
