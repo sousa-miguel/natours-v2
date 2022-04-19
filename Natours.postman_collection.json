@@ -103,17 +103,11 @@
 									}
 								],
 								"url": {
-									"raw": "http://127.0.0.1:3000/api/v1/tours",
-									"protocol": "http",
+									"raw": "{{URL}}api/v1/tours",
 									"host": [
-										"127",
-										"0",
-										"0",
-										"1"
+										"{{URL}}api"
 									],
-									"port": "3000",
 									"path": [
-										"api",
 										"v1",
 										"tours"
 									],
@@ -370,23 +364,49 @@
 						"method": "PATCH",
 						"header": [],
 						"body": {
-							"mode": "raw",
-							"raw": "{   \r\n    \"guides\": [\"624ec0cbfc0a0852bf2f1e8b\"]\r\n}\r\n",
-							"options": {
-								"raw": {
-									"language": "json"
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "imageCover",
+									"type": "file",
+									"src": "/home/sousa/Desktop/leo.jpg",
+									"disabled": true
+								},
+								{
+									"key": "images",
+									"type": "file",
+									"src": "/home/sousa/Desktop/aarav.jpg",
+									"disabled": true
+								},
+								{
+									"key": "images",
+									"type": "file",
+									"src": "/home/sousa/Desktop/leo.jpg",
+									"disabled": true
+								},
+								{
+									"key": "price",
+									"value": "1000",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "images",
+									"type": "file",
+									"src": "/home/sousa/natours/public/img/tours/tour-2-1.jpg",
+									"disabled": true
 								}
-							}
+							]
 						},
 						"url": {
-							"raw": "{{URL}}api/v1/tours/6251cd200187341c61312456",
+							"raw": "{{URL}}api/v1/tours/625d985efd94a422afad0d1d",
 							"host": [
 								"{{URL}}api"
 							],
 							"path": [
 								"v1",
 								"tours",
-								"6251cd200187341c61312456"
+								"625d985efd94a422afad0d1d"
 							]
 						}
 					},
@@ -528,13 +548,20 @@
 						"method": "PATCH",
 						"header": [],
 						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"name\": \"admin\",\n    \"email\": \"admin@natours.com\",\n    \"role\": \"admin\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "Rita",
+									"type": "text"
+								},
+								{
+									"key": "photo",
+									"type": "file",
+									"src": "/home/sousa/Desktop/aarav.jpg",
+									"disabled": true
 								}
-							}
+							]
 						},
 						"url": {
 							"raw": "{{URL}}api/v1/users/updateMe",
@@ -708,7 +735,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Rita\",\n    \"email\": \"rita2@natours.com\",\n    \"password\": \"test1234\",\n    \"passwordConfirm\": \"test1234\"\n}",
+							"raw": "{\n    \"name\": \"Rita\",\n    \"email\": \"rimlokirtu@vusra.com\",\n    \"password\": \"test1234\",\n    \"passwordConfirm\": \"test1234\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -736,7 +763,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"miiguelsousa2@hotmail.com\"\n}",
+							"raw": "{\n    \"email\": \"admin@natours.io\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -778,7 +805,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"password\": \"1234567891\",\n    \"passwordConfirm\": \"1234567891\"\n}",
+							"raw": "{\n    \"password\": \"test1234\",\n    \"passwordConfirm\": \"test1234\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -786,7 +813,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{URL}}api/v1/users/resetPassword/a9e9787016e090e82b818988be59b77f4de930150fdac1c4378e14b0be339fb4",
+							"raw": "{{URL}}api/v1/users/resetPassword/bf03d01a6bcd4404a2b410f03ba0837355c9a1147dc3de0e3325d6d63df18fcc",
 							"host": [
 								"{{URL}}api"
 							],
@@ -794,7 +821,7 @@
 								"v1",
 								"users",
 								"resetPassword",
-								"a9e9787016e090e82b818988be59b77f4de930150fdac1c4378e14b0be339fb4"
+								"bf03d01a6bcd4404a2b410f03ba0837355c9a1147dc3de0e3325d6d63df18fcc"
 							]
 						}
 					},
@@ -1138,15 +1165,174 @@
 							}
 						},
 						"url": {
-							"raw": "{{URL}}api/v1/tours/625738ae9d02c522b3eeaa48/reviews",
+							"raw": "{{URL}}api/v1/tours/5c88fa8cf4afda39709c2951/reviews",
 							"host": [
 								"{{URL}}api"
 							],
 							"path": [
 								"v1",
 								"tours",
-								"625738ae9d02c522b3eeaa48",
+								"5c88fa8cf4afda39709c2951",
 								"reviews"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Bookings",
+			"item": [
+				{
+					"name": "Checkout session",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}api/v1/bookings/checkout-session/5c88fa8cf4afda39709c2951",
+							"host": [
+								"{{URL}}api"
+							],
+							"path": [
+								"v1",
+								"bookings",
+								"checkout-session",
+								"5c88fa8cf4afda39709c2951"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Bookings",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}api/v1/bookings",
+							"host": [
+								"{{URL}}api"
+							],
+							"path": [
+								"v1",
+								"bookings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Booking",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}api/v1/bookings/625e926cae632377cbfcb6b5",
+							"host": [
+								"{{URL}}api"
+							],
+							"path": [
+								"v1",
+								"bookings",
+								"625e926cae632377cbfcb6b5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Booking",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"price\": 1000\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}api/v1/bookings/625e926cae632377cbfcb6b5",
+							"host": [
+								"{{URL}}api"
+							],
+							"path": [
+								"v1",
+								"bookings",
+								"625e926cae632377cbfcb6b5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Booking",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}api/v1/bookings/625e926cae632377cbfcb6b5",
+							"host": [
+								"{{URL}}api"
+							],
+							"path": [
+								"v1",
+								"bookings",
+								"625e926cae632377cbfcb6b5"
 							]
 						}
 					},

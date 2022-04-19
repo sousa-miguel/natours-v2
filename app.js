@@ -14,6 +14,7 @@ const globalErrorHandler = require('./controllers/errorController');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
+const bookingRouter = require('./routes/bookingRoutes');
 const viewRouter = require('./routes/viewRoutes');
 
 const app = express();
@@ -89,6 +90,7 @@ app.use('/', viewRouter);
 app.use(`${apiPath}tours`, tourRouter);
 app.use(`${apiPath}users`, userRouter);
 app.use(`${apiPath}reviews`, reviewRouter);
+app.use(`${apiPath}bookings`, bookingRouter);
 
 // if we are able to reach this point it means the url is invalid
 app.all('*', (req, res, next) => {
